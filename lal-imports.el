@@ -61,10 +61,26 @@
       (delete-region start (point)) )))
 
 
+
+(defun add-a-numeric-prefix-for-domain (d)
+  (message d)
+  (let ((prefix
+         (cond
+          ((starts-with d "com.phonegap.lal") "000")
+          ((starts-with d "java.") "100")
+          (t "001"))))
+    (concat prefix d)))
+
+(defun lal-import-lessp (imp1 imp2)
+  (string-lessp
+   (add-a-numeric-prefix-for-domain imp1)
+   (add-a-numeric-prefix-for-domain imp2)))
+
 (defun lal-reorder-imports ()
   (interactive)
   (save-excursion
     (let ((old-imports (imports-in-buffer)))
       (delete-all-imports) 
       (mapc (lambda (val) (insert-string (concat "import  " val "\n")))
-            (sort old-imports '<)))))
+            (sort old-imports 'lal-import-lessp)))))
+
