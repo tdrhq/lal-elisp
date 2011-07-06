@@ -71,6 +71,24 @@
           (t "001"))))
     (concat prefix d)))
 
+(defun add-newline-after-phonegap ()
+  (save-excursion
+    (beginning-of-buffer)
+    (while (re-search-forward "^import com.phonegap.lal.*" nil t))
+
+    ;; be careful
+    (beginning-of-line)
+    (if (re-search-forward "^import com.phonegap.lal" nil t)
+        (progn (end-of-line)
+               (insert-char ?\n 1)))))
+
+(defun add-newline-before-java ()
+  (progn
+    (beginning-of-buffer)
+    (if (re-search-forward "^import java.*" nil t)
+        (progn (beginning-of-line)
+               (insert-char ?\n 1)))))
+
 (defun lal-import-lessp (imp1 imp2)
   (string-lessp
    (add-a-numeric-prefix-for-domain imp1)
@@ -81,6 +99,9 @@
   (save-excursion
     (let ((old-imports (imports-in-buffer)))
       (delete-all-imports) 
-      (mapc (lambda (val) (insert-string (concat "import  " val "\n")))
-            (sort old-imports 'lal-import-lessp)))))
+      (mapc (lambda (val) (insert-string (concat "import " val "\n")))
+            (sort old-imports 'lal-import-lessp))
+
+      (add-newline-after-phonegap)
+      (add-newline-before-java))))
 
